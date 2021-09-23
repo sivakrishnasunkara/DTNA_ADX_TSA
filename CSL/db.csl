@@ -1,0 +1,266 @@
+.alter database Samples policy merge @'{"RowCountUpperBoundForMerge":0,"OriginalSizeMBUpperBoundForMerge":0,"MaxExtentsToMerge":100,"LoopPeriod":"01:00:00","MaxRangeInHours":6,"AllowRebuild":true,"AllowMerge":true,"Lookback":{"Kind":0,"CustomPeriod":null}}'
+.alter database Samples policy sharding "{\"MaxRowCount\":750000,\"MaxExtentSizeInMb\":1024,\"MaxOriginalSizeInMb\":2048,\"UseShardEngine\":true,\"ShardEngineMaxRowCount\":1048576,\"ShardEngineMaxExtentSizeInMb\":8192,\"ShardEngineMaxOriginalSizeInMb\":3072}"
+.create-merge table StormEvents (StartTime:datetime, EndTime:datetime, EpisodeId:int, EventId:int, State:string, EventType:string, InjuriesDirect:int, InjuriesIndirect:int, DeathsDirect:int, DeathsIndirect:int, DamageProperty:int, DamageCrops:int, Source:string, BeginLocation:string, EndLocation:string, BeginLat:real, BeginLon:real, EndLat:real, EndLon:real, EpisodeNarrative:string, EventNarrative:string, StormSummary:dynamic) with (folder = "Storm_Events", docstring = "US storm events. Data source: https://www.ncdc.noaa.gov/stormevents") 
+.create-merge table demo_make_series1 (TimeStamp:datetime, BrowserVer:string, OsVer:string, Country:string) with (folder = "TimeSeries_and_ML") 
+.alter table demo_make_series1 policy ingestiontime true
+.create-merge table demo_series2 (['id']:string, x:dynamic, y:dynamic) with (folder = "TimeSeries_and_ML") 
+.alter table demo_series2 policy ingestiontime true
+.create-merge table demo_series3 (['id']:string, t:dynamic, num:dynamic) with (folder = "TimeSeries_and_ML") 
+.alter table demo_series3 policy ingestiontime true
+.create-merge table demo_many_series1 (TIMESTAMP:datetime, Loc:string, Op:string, DB:string, DataRead:long) with (folder = "TimeSeries_and_ML") 
+.alter table demo_many_series1 policy ingestiontime true
+.create-merge table ConferenceSessions (conference:string, sessionid:string, session_title:string, session_type:string, owner:string, participants:string, URL:string, level:int, session_location:string, starttime:datetime, duration:int, time_and_duration:string, kusto_affinity:string) with (folder = "ADX_Conferences") 
+.alter table ConferenceSessions policy ingestiontime true
+.create-merge table demo_make_series2 (sid:string, TimeStamp:datetime, num:real) with (folder = "TimeSeries_and_ML") 
+.alter table demo_make_series2 policy ingestiontime true
+.create-merge table demo_clustering1 (PreciseTimeStamp:datetime, Region:string, ScaleUnit:string, DeploymentId:string, Tracepoint:long, ServiceHost:string) with (folder = "TimeSeries_and_ML") 
+.alter table demo_clustering1 policy ingestiontime true
+.create-merge table Covid19_Bing (Location:dynamic, Confirmed:dynamic, Active:dynamic, Deaths:dynamic, Recovered:dynamic, ReportDate:datetime, Id:string, LastUpdated:string, LastRefreshed:string, Sources:string, AreaInfo:dynamic, Location_1:string, ReportDate_1:string, LastUpdated_1:datetime, LastRefreshed_1:datetime, Sources_1:dynamic) with (folder = "Covid19", docstring = "Data source: https://bing.com/covid19") 
+.alter table Covid19_Bing policy ingestiontime true
+.create-merge table Covid19_map2 (AreaInfo:dynamic, Location:string, Confirmed:dynamic, Active:dynamic, Deaths:dynamic, Recovered:dynamic, ReportDate:string, Id:string, LastUpdated:datetime, LastRefreshed:datetime, Sources:dynamic) with (folder = "Covid19") 
+.alter table Covid19_map2 policy ingestiontime true
+.create-merge table US_States (features:dynamic) with (folder = "Geospatial", docstring = "US States. Data source: https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html") 
+.alter table US_States policy ingestiontime true
+.create-merge table US_Counties (features:dynamic) with (folder = "Geospatial", docstring = "US Counties. Data source: https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html") 
+.alter table US_Counties policy ingestiontime true
+.create-merge table Covid19 (Timestamp:datetime, Country:string, State:string, CountryCode:string, StateCode:string, Latitute:real, Longtitude:real, Confirmed:long, Deaths:long, Recovered:long, Active:long) with (folder = "Covid19") 
+.alter table Covid19 policy ingestiontime true
+.create-merge table irregular_ts (OsVer:string, TimeStamp:dynamic, num:dynamic) with (folder = "TimeSeries_and_ML") 
+.alter table irregular_ts policy ingestiontime true
+.create-merge table demo_prometheus (TimeStamp:datetime, Name:string, Labels:dynamic, Val:real) with (folder = "TimeSeries_and_ML") 
+.alter table demo_prometheus policy ingestiontime true
+.create-merge table PopulationData (State:string, Population:long) 
+.alter table PopulationData policy ingestiontime true
+.create-merge table OccupancyDetection (Timestamp:datetime, Temperature:real, Humidity:real, Light:real, CO2:real, HumidityRatio:real, Occupancy:bool, Test:bool) with (folder = "TimeSeries_and_ML") 
+.alter table OccupancyDetection policy ingestiontime true
+.create-merge table SamplePowerRequirementHistorizedData (timestamp:datetime, twinId:string, modelId:string, name:string, value:real, relationshipTarget:dynamic, relationshipId:dynamic) with (folder = "IoT", docstring = "Contains historized property values over a one month period") 
+.alter table Samples.SamplePowerRequirementHistorizedData policy retention @'{"SoftDeletePeriod":"36500.00:00:00","Recoverability":"Enabled"}'
+.alter table SamplePowerRequirementHistorizedData policy caching hotdata=time(36500.00:00:00) hotindex=time(36500.00:00:00)
+.alter table SamplePowerRequirementHistorizedData policy ingestiontime true
+.create-or-alter function with (folder = "Demo", docstring = "Simple demo function", skipvalidation = "true") MyFunction1() {     StormEvents     | limit 100 }  
+.create-or-alter function with (folder = "Demo", docstring = "Demo function with parameter", skipvalidation = "true") MyFunction2(myLimit:long) {     StormEvents     | limit myLimit }  
+.create-or-alter function with (folder = "Demo", docstring = "Function calling other function", skipvalidation = "true") MyFunction3() {     MyFunction(100) }  
+.create-or-alter function with (folder = "Demo", docstring = "Function calling other function", skipvalidation = "true") MyFunction4() {
+    let limitVar = 100;
+    let result = MyFunction(limitVar);
+    result
+} 
+.create-or-alter function with (folder = "Demo", docstring = "Simple demo function", skipvalidation = "true") MyFunction(someLimit:long) {
+    StormEvents
+    | limit someLimit
+} 
+.create-or-alter function with (folder = "Helpers", docstring = "A list of interesting states", skipvalidation = "true") InterestingStates() {
+    dynamic(["WASHINGTON", "FLORIDA", "GEORGIA", "NEW YORK"])
+}
+.create-or-alter function with (folder = "Demo", docstring = "Remove Spaces", skipvalidation = "true") Trim(text:string) {extract(@"\s*(.*)",1,text)}
+.create-or-alter function with (folder = "", docstring = "", skipvalidation = "true") MyCalc(a:real, b:real, c:real) {a+b+c}
+.create-or-alter function with (folder = "Demo", docstring = "Demo function with parameter", skipvalidation = "true") MyFunction5(myLimit:long) {StormEvents | limit myLimit}
+
+.create-or-alter function with (skipvalidation = "true") Add(a:real, b:real) {a+b}
+.create-or-alter function with (folder = "Demo", docstring = "Demo function with date", skipvalidation = "true") MyFunctionDate(timestamp:datetime) {
+    StormEvents
+    | where EndTime <= timestamp
+}
+.create-or-alter function with (folder = "Demo", docstring = "demo function with parameter", skipvalidation = "true") MyFunction6(myLimit:long) {StromEvents | limit myLimit}
+.create-or-alter function with (folder = "StormEventsFunctions", skipvalidation = "true") StormsReportedBySource(source:string) {
+    StormEvents
+    | where Source == source
+}
+.create-or-alter function with (docstring = "Table access example", skipvalidation = "true") TableAccess(tableName:string) {
+    table(tableName) | count
+}
+.create-or-alter function with (docstring = "Direct table access example", skipvalidation = "true") DirectTableAccess(myTable:(*)) {
+    myTable | count
+}
+.create-or-alter function with (folder = "Packages\\Utils", docstring = "Returns version information for the Python engine and the specified packages", skipvalidation = "true") get_modules_version_sf(modules:(*)) {
+    let code =
+    'import importlib\n'
+    'import sys\n'
+    '\n'
+    'result = df\n'
+    'for i in range(df.shape[0]):\n'
+    '    try:\n'
+    '        m = importlib.import_module(df.iloc[i, 0])\n'
+    '        result.loc[i, "ver"] = m.__version__ if hasattr(m, "__version__") else "missing __version__ attribute"\n'
+    '    except Exception as ex:\n'
+    '        result.loc[i, "ver"] = "ERROR: " + (ex.msg if hasattr(ex, "msg") else "exception, no msg")\n'
+    'id = df.shape[0]\n'
+    'result.loc[id, df.columns[0]] = "Python"\n'
+    'result.loc[id, "ver"] = sys.version\n';
+    modules | evaluate python(code, 'df(*),ver:string')
+}
+.create-or-alter function with (folder = "StormEventsFunctions", docstring = "", skipvalidation = "true") StormsReportedByStateAndSource(['state']:string, source:string) {
+    StormEvents
+    | where State == state
+    | where Source == source
+}
+.create-or-alter function with (folder = "StormEventsFunctions", skipvalidation = "true") StormEventsStates() {
+    StormEvents
+    | summarize by State
+}
+.create-or-alter function with (folder = "PQTest", docstring = "Test Doc", skipvalidation = "true") PQ_ComplexTableParam(d:(a:string,b:int,['c"']:timespan), q:(*), j:dynamic, e:bool=true, f:string="TestDefault", g:int=42, h:long=345678, i:real=real(+inf), k:real=0.444, l:timespan=time(1.00:00:00), m:decimal=decimal(0.33), n:datetime=datetime(2000-01-01T12:34:56.7890000Z), o:datetime=datetime(2021-09-23T11:45:33.9089295Z), p:decimal=decimal(100000), r:guid=guid(74be27de-1e4e-49d9-b579-fe0b331d3642), s:string="\'") {
+    d
+}
+.create-or-alter function with (folder = "CoronaVirus", skipvalidation = "true") JoinCorona() {
+CoronaConfirmed
+| extend Confirmed= Count
+| join kind=fullouter 
+(CoronaDeaths | extend Deaths = Count) on ProvinceOrState, CountryOrRegion, Timestamp
+| join kind=fullouter 
+(CoronaRecovered | extend Recovered = Count) on ProvinceOrState, CountryOrRegion, Timestamp
+| project Timestamp, CountryOrRegion, ProvinceOrState, Confirmed, Deaths, Recovered, Lat, Long
+| where Confirmed >0 or Deaths > 0 or Recovered > 0
+}
+.create-or-alter function with (folder = "CoronaVirus", skipvalidation = "true") UpdateCovidCountries() {
+let lastRefreshed = toscalar(CovidCountries | summarize max(LastRefreshed)); 
+let newRefreshed = toscalar(externaldata(d:string)["https://binganswer.blob.core.windows.net/cssegisanddata/Covid19.Country.json"]
+with(format=txt)
+| mv-expand todynamic(d)
+| evaluate bag_unpack(d)
+| summarize max(LastRefreshed));
+let RequiresUpdate = lastRefreshed < newRefreshed; 
+externaldata(d:string)["https://binganswer.blob.core.windows.net/cssegisanddata/Covid19.Country.json"]
+with(format=txt)
+| mv-expand todynamic(d)
+| evaluate bag_unpack(d)
+| project ReportDate, LastUpdated, LastRefreshed, Country, Province, Latitude, Longitude, Confirmed, ConfirmedChange, Recovered, RecoveredChange, Deaths, DeathsChange, Active
+| join kind=leftanti
+(
+    CovidCountries |summarize arg_max(LastRefreshed, *) by Country, Province
+) on Country, Province, Confirmed, Recovered, Deaths
+| where RequiresUpdate 
+}
+.create-or-alter function with (folder = "Covid19_Bing", skipvalidation = "true") Covid19_flat() {    
+    let Historic =
+    Covid19_Bing
+    | extend Id = iff(Id == "/" and isnotempty(Location.CountryName) and Location.CountryName != "Worldwide", strcat('/', Location.CountryName), Id)
+    | project 
+        ReportDate,
+        Country = tostring(Location.CountryName),
+        Longitude = toreal(Location.Longitude),
+        Latitude = toreal(Location.Latitude),
+        Confirmed = tolong(Confirmed.Value), ConfirmedChange = tolong(Confirmed.Change), 
+        Active = tolong(Active.Value), ActiveChange = tolong(Active.Change), 
+        Deaths = tolong(Deaths.Value), DeathsChange = tolong(Deaths.Change),
+        Id,  
+        Location;
+     let IdMap = Historic | where ReportDate > ago(5d) | extend State = Location.StateCode | extend StateOrCountry= iff(isempty(State), Country, State) |  summarize by StateOrCountry, Id;         
+     let Recent = Covid19_map2 
+        | project 
+                ReportDate = LastUpdated,
+                Country = tostring(AreaInfo.CountryName),
+                Longitude = todouble(AreaInfo.Longitude),
+                Latitude = todouble(AreaInfo.Latitude),
+                Confirmed = tolong(Confirmed.Value), ConfirmedChange = tolong(Confirmed.Change),
+                Active = tolong(Active.Value), ActiveChange = tolong(Active.Change),
+                Deaths = tolong(Deaths.Value), DeathsChange = tolong(Deaths.Change),
+                Recovered = tolong(Recovered.Value), RecoveredChange = tolong(Recovered.Change),
+                State = tostring(AreaInfo.StateName)
+        | extend Active = iff(isempty(Active) and Confirmed >0 , Confirmed - Deaths - iff(isempty(Recovered), 0, Recovered), Active)
+        | extend StateOrCountry = iff(isempty(State), Country, State)
+        | join (IdMap) on StateOrCountry | project-away StateOrCountry, StateOrCountry1, State
+        | summarize arg_max(ReportDate, *) by Id;
+        Historic | union Recent
+}
+.create-or-alter function with (skipvalidation = "true") temp() {    
+    let Historic =
+    Covid19_Bing
+    | extend Id = iff(Id == "/" and isnotempty(Location.CountryName) and Location.CountryName != "Worldwide", strcat('/', Location.CountryName), Id)
+    | project 
+        ReportDate,
+        Country = tostring(Location.CountryName),
+        Longitude = toreal(Location.Longitude),
+        Latitude = toreal(Location.Latitude),
+        Confirmed = tolong(Confirmed.Value), ConfirmedChange = tolong(Confirmed.Change), 
+        Active = tolong(Active.Value), ActiveChange = tolong(Active.Change), 
+        Deaths = tolong(Deaths.Value), DeathsChange = tolong(Deaths.Change),
+        Id,  
+        Location;
+     let IdMap = Historic | where ReportDate > ago(5d) | extend State = Location.StateCode | extend StateOrCountry= iff(isempty(State), Country, State) |  summarize by StateOrCountry, Id;         
+     let Recent = Covid19_map2 
+        | project 
+                ReportDate = LastUpdated,
+                Country = tostring(AreaInfo.CountryName),
+                Longitude = todouble(AreaInfo.Longitude),
+                Latitude = todouble(AreaInfo.Latitude),
+                Confirmed = tolong(Confirmed.Value), ConfirmedChange = tolong(Confirmed.Change),
+                Active = tolong(Confirmed.Value), ActiveChange = tolong(Confirmed.Change),
+                Deaths = tolong(Deaths.Value), DeathsChange = tolong(Deaths.Change),
+                State = tostring(AreaInfo.StateName)
+        | extend StateOrCountry = iff(isempty(State), Country, State)
+        | join (IdMap) on StateOrCountry | project-away StateOrCountry, StateOrCountry1, State;
+        Historic | union Recent
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Calculate moving average of specified width", skipvalidation = "true") series_moving_avg_fl(y_series:dynamic, n:int, center:bool=false) {
+    series_fir(y_series, repeat(1, n), true, center)
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Calculate the dot product of 2 numerical arrays", skipvalidation = "true") series_dot_product_fl(vec1:dynamic, vec2:dynamic) {
+    let elem_prod = series_multiply(vec1, vec2);
+    let cum_sum = series_iir(elem_prod, dynamic([1]), dynamic([1,-1]));
+    todouble(cum_sum[-1])
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Basic exponential smoothing for a series", skipvalidation = "true") series_exp_smoothing_fl(y_series:dynamic, alpha:real=0.5) {
+    series_iir(y_series, pack_array(alpha), pack_array(1, alpha-1))
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Downsampling a series by an integer factor", skipvalidation = "true") series_downsample_fl(tbl:(*), t_col:string, y_col:string, ds_t_col:string, ds_y_col:string, sampling_factor:int) {
+    tbl
+    | extend _t_ = column_ifexists(t_col, dynamic(0)), _y_ = column_ifexists(y_col, dynamic(0))
+    | extend _y_ = series_fir(_y_, repeat(1, sampling_factor), true, true)    //  apply a simple low pass filter before sub-sampling
+    | mv-apply _t_ to typeof(DateTime), _y_ to typeof(double) on
+    (extend rid=row_number()-1
+    | where rid % sampling_factor == ceiling(sampling_factor/2.0)-1                    //  sub-sampling
+    | summarize _t_ = make_list(_t_), _y_ = make_list(_y_))
+    | extend cols = pack(ds_t_col, _t_, ds_y_col, _y_)
+    | project-away _t_, _y_
+    | evaluate bag_unpack(cols)
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Selecting & retrieving metrics like PromQL", skipvalidation = "true") series_metric_fl(metrics_tbl:(*), timestamp_col:string, name_col:string, labels_col:string, value_col:string, metric_name:string, labels_selector:string="", ['lookback']:timespan=time(00:10:00), offset:timespan=time(00:00:00)) {
+    let selector_d=iff(labels_selector == '', dynamic(['']), split(labels_selector, ','));
+    let etime = ago(offset);
+    let stime = etime - lookback;
+    metrics_tbl
+    | extend timestamp = column_ifexists(timestamp_col, datetime(null)), name = column_ifexists(name_col, ''), labels = column_ifexists(labels_col, dynamic(null)), value = column_ifexists(value_col, 0)
+    | extend labels = dynamic_to_json(labels)       //  convert to string and sort by key
+    | where name == metric_name and timestamp between(stime..etime)
+    | order by timestamp asc
+    | summarize timestamp = make_list(timestamp), value=make_list(value) by name, labels
+    | where labels has_all (selector_d)
+}
+.create-or-alter function with (folder = "Packages\\Series", docstring = "Simulate PromQL rate()", skipvalidation = "true") series_rate_fl(tbl:(timestamp:dynamic,value:dynamic), n_bins:int=1, fix_reset:bool=true) {
+    tbl
+    | where fix_reset                                                   //  Prometheus counters can only go up
+    | mv-apply value to typeof(double) on   
+    ( extend correction = iff(value < prev(value), prev(value), 0.0)    // if the value decreases we assume it was reset to 0, so add last value
+    | extend cum_correction = row_cumsum(correction)
+    | extend corrected_value = value + cum_correction
+    | summarize value = make_list(corrected_value))
+    | union (tbl | where not(fix_reset))
+    | extend timestampS = array_shift_right(timestamp, n_bins), valueS = array_shift_right(value, n_bins)
+    | extend dt = series_subtract(timestamp, timestampS)
+    | extend dt = series_divide(dt, 1e7)                              //  converts from ticks to seconds
+    | extend dv = series_subtract(value, valueS)
+    | extend rate = series_divide(dv, dt)
+    | project-away dt, dv, timestampS, value, valueS
+}
+.create-or-alter function with (skipvalidation = "true") GetStatesWithPopulationSmallerThan(amount:long) { 
+    PopulationData
+    | where Population < amount
+    | project State;
+}
+.create-or-alter function with (folder = "Packages\\Stats", docstring = "Calculate factorial", skipvalidation = "true") factorial_fl(n:int) {
+    tolong(gamma(n+1))
+}
+.create-or-alter function with (folder = "Packages\\Stats", docstring = "Calculate number of combinations of selecting k items from total n items with order", skipvalidation = "true") perm_fl(n:int, k:int) {
+    let fact_n = gamma(n+1);
+    let fact_nk = gamma(n-k+1);
+    tolong(fact_n/fact_nk)
+}
+.create-or-alter function with (folder = "Packages\\Stats", docstring = "Calculate number of combinations for selection of k items out of n items without order", skipvalidation = "true") comb_fl(n:int, k:int) {
+    let fact_n = gamma(n+1);
+    let fact_nk = gamma(n-k+1);
+    let fact_k = gamma(k+1);
+    tolong(fact_n/fact_nk/fact_k)
+}
+.create  ifnotexists  materialized-view  with ( Folder="Covid19") DailyCovid19 on table Covid19 { Covid19
+    | summarize max(Confirmed), max(Deaths), max(Recovered), max(Active) by bin(Timestamp, 1d), Country, State, CountryCode, StateCode }
+.alter materialized-view DailyCovid19 policy merge "{\"RowCountUpperBoundForMerge\":16000000,\"OriginalSizeMBUpperBoundForMerge\":0,\"MaxExtentsToMerge\":100,\"LoopPeriod\":\"01:00:00\",\"MaxRangeInHours\":336,\"AllowRebuild\":true,\"AllowMerge\":true,\"Lookback\":{\"Kind\":0,\"CustomPeriod\":null}}"
