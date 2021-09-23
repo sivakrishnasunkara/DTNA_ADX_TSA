@@ -1,3 +1,4 @@
+.execute database script <|
 .alter database TSAdb policy retention @'{"SoftDeletePeriod":"365.00:00:00","Recoverability":"Enabled"}'
 .alter database TSAdb policy merge @'{"RowCountUpperBoundForMerge":16000000,"OriginalSizeMBUpperBoundForMerge":0,"MaxExtentsToMerge":100,"LoopPeriod":"01:00:00","MaxRangeInHours":24,"AllowRebuild":true,"AllowMerge":true,"Lookback":{"Kind":0,"CustomPeriod":null}}'
 .alter database TSAdb policy caching hotdata=time(3650.00:00:00) hotindex=time(3650.00:00:00)
