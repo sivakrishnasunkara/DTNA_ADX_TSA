@@ -98,7 +98,7 @@
     StormEvents
     | summarize by State
 }
-.create-or-alter function with (folder = "PQTest", docstring = "Test Doc", skipvalidation = "true") PQ_ComplexTableParam(d:(a:string,b:int,['c"']:timespan), q:(*), j:dynamic, e:bool=true, f:string="TestDefault", g:int=42, h:long=345678, i:real=real(+inf), k:real=0.444, l:timespan=time(1.00:00:00), m:decimal=decimal(0.33), n:datetime=datetime(2000-01-01T12:34:56.7890000Z), o:datetime=datetime(2021-09-23T11:45:33.9089295Z), p:decimal=decimal(100000), r:guid=guid(74be27de-1e4e-49d9-b579-fe0b331d3642), s:string="\'") {
+.create-or-alter function with (folder = "PQTest", docstring = "Test Doc", skipvalidation = "true") PQ_ComplexTableParam(d:(a:string,b:int,['c"']:timespan), q:(*), j:dynamic, e:bool=true, f:string="TestDefault", g:int=42, h:long=345678, i:real=real(+inf), k:real=0.444, l:timespan=time(1.00:00:00), m:decimal=decimal(0.33), n:datetime=datetime(2000-01-01T12:34:56.7890000Z), o:datetime=datetime(2021-09-23T12:07:32.4822373Z), p:decimal=decimal(100000), r:guid=guid(74be27de-1e4e-49d9-b579-fe0b331d3642), s:string="\'") {
     d
 }
 .create-or-alter function with (folder = "CoronaVirus", skipvalidation = "true") JoinCorona() {
