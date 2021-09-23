@@ -1,6 +1,6 @@
-.alter database cropdb policy retention @'{"SoftDeletePeriod":"365.00:00:00","Recoverability":"Enabled"}'
-.alter database cropdb policy merge @'{"RowCountUpperBoundForMerge":16000000,"OriginalSizeMBUpperBoundForMerge":0,"MaxExtentsToMerge":100,"LoopPeriod":"01:00:00","MaxRangeInHours":24,"AllowRebuild":true,"AllowMerge":true,"Lookback":{"Kind":0,"CustomPeriod":null}}'
-.alter database cropdb policy caching hotdata=time(3650.00:00:00) hotindex=time(3650.00:00:00)
+.alter database TSAdb policy retention @'{"SoftDeletePeriod":"365.00:00:00","Recoverability":"Enabled"}'
+.alter database TSAdb policy merge @'{"RowCountUpperBoundForMerge":16000000,"OriginalSizeMBUpperBoundForMerge":0,"MaxExtentsToMerge":100,"LoopPeriod":"01:00:00","MaxRangeInHours":24,"AllowRebuild":true,"AllowMerge":true,"Lookback":{"Kind":0,"CustomPeriod":null}}'
+.alter database TSAdb policy caching hotdata=time(3650.00:00:00) hotindex=time(3650.00:00:00)
 .create-merge table StormEvents (StartTime:datetime, EndTime:datetime, EpisodeId:int, EventId:int, State:string, EventType:string, InjuriesDirect:int, InjuriesIndirect:int, DeathsDirect:int, DeathsIndirect:int, DamageProperty:int, DamageCrops:int, Source:string, BeginLocation:string, EndLocation:string, BeginLat:real, BeginLon:real, EndLat:real, EndLon:real, EpisodeNarrative:string, EventNarrative:string, StormSummary:dynamic) 
 .alter table StormEvents policy ingestiontime true
 .create-or-alter function with (skipvalidation = "true") GetTotalDamagePropertyByState() {
